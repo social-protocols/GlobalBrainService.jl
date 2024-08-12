@@ -49,7 +49,7 @@ docker-build:
   COPY ./service/server.jl ./
 
   EXPOSE 8000
-  CMD ["/usr/local/julia/bin/julia", "--project", "server.jl"]
+  CMD ["bash", "-c", "echo starting julia... && julia -t auto --code-coverage=none --check-bounds=yes --project server.jl"]
   SAVE IMAGE global-brain:latest
 
 
