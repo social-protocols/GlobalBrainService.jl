@@ -2,10 +2,14 @@
     The Global Brain Algorithm
 </h1>
 
-
 >[!NOTE]
 >*This is a reference implementation and experimentation sandbox for the [Global Brain algorithm](https://social-protocols.org/global-brain/).*
 
+<div align="center">
+    
+[![zulip](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://social-protocols.zulipchat.com/join/rsdyqo4s4qnajccpohddp4lf/)
+
+</div>
 
 ## Setup
 
