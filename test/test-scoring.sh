@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/usr/bin/env bash
 set -Eeuo pipefail
 
 test_vote_events_json_file='test-data/vote-events.jsonl'

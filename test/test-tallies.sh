@@ -1,5 +1,4 @@
-#!/bin/sh
-
+#!/usr/bin/env bash
 set -Eeuo pipefail
 
 expected_tallies_file='test-data/expected-tallies.txt'
