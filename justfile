@@ -43,6 +43,12 @@ build-shared-library:
     rm -rf globalbrain-node/julia/build
     cd globalbrain-node/julia && time julia -t auto --startup-file=no --project -e 'using Pkg; Pkg.instantiate(); include("build.jl")'
 
+docker-build:
+  earthly +docker-build
+
+docker-run:
+  docker run --user $(id -u):$(id -g) -p 8000:8000 -e DATABASE_PATH=/tmp/globalbrain.db global-brain
+
 
 ############ TESTS ##############
 

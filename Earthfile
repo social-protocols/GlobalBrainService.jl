@@ -39,6 +39,7 @@ docker-build:
   FROM julia:1.10
 
   WORKDIR /app
+  ENV JULIA_DEPOT_PATH="/julia_depot" # default would be in /root
   COPY Manifest.toml Project.toml ./
   COPY --dir src ./
   RUN julia -t auto --code-coverage=none --check-bounds=yes --project -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
@@ -46,7 +47,20 @@ docker-build:
   WORKDIR /app/service
   COPY ./service/Project.toml ./service/Manifest.toml ./
   RUN julia -t auto --code-coverage=none --check-bounds=yes --project -e 'using Pkg; Pkg.instantiate()'
-  COPY ./service/server.jl ./
+  COPY ./service/server.jl test-rest-api.sh ./
+  # warm up julia code by running one http request against the server
+  RUN bash -c 'set -e; \
+    export DATABASE_PATH=/tmp/tmp.db; \
+    julia -t auto --code-coverage=none --check-bounds=yes --project server.jl & \
+    julia_pid=$!; \
+    for i in {1..60}; do \
+      echo "connecting to http server..."
+      ./test-rest-api.sh && break || sleep 1; \
+    done; \
+    kill $julia_pid; \
+    rm /tmp/tmp.db'
+  # all caches were created as root, but if we run docker with another user, those files should be accessible
+  RUN chmod -R 0777 "$JULIA_DEPOT_PATH"
 
   EXPOSE 8000
   CMD ["bash", "-c", "echo starting julia... && julia -t auto --code-coverage=none --check-bounds=yes --project server.jl"]
