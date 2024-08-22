@@ -38,13 +38,13 @@ root-julia-setup:
 docker-build:
   FROM julia:1.10
 
-  WORKDIR /app
+  WORKDIR /globalbrain
   ENV JULIA_DEPOT_PATH="/julia_depot" # default would be in /root
   COPY Manifest.toml Project.toml ./
   COPY --dir src ./
   RUN julia -t auto --code-coverage=none --check-bounds=yes --project -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
 
-  WORKDIR /app/service
+  WORKDIR /globalbrain/service
   COPY ./service/Project.toml ./service/Manifest.toml ./
   RUN julia -t auto --code-coverage=none --check-bounds=yes --project -e 'using Pkg; Pkg.instantiate()'
   COPY ./service/server.jl test-rest-api.sh ./
