@@ -164,6 +164,42 @@ function create_schema(db::SQLite.DB)
                 from Lineage ancestor
                 where ancestor.descendant_id = new.parent_id
                 ;
+
+                -- It is possible that this post is inserted *after* some of its children
+                -- In that case, the ancestry for those children (and their children) will
+                -- be incomplete.
+
+                -- Insert a lineage record for all children joined to all ancestors
+                insert into lineage
+                select
+                      ancestor.ancestor_id
+                      , child.id descendant_id
+                      , ancestor.separation + 1 as separation
+                      -- *
+                from
+                    post child
+                join Lineage ancestor
+                     on ancestor.descendant_id = new.id
+                where
+                    child.parent_id = new.id
+                ;
+
+                -- Insert a lineage record for all descendants joined to all ancestors
+                insert into Lineage
+                select
+                      ancestor.ancestor_id
+                      , descendant.descendant_id
+                      , ancestor.separation + descendant.separation + 1 as separation
+                from
+                    post child
+                join Lineage descendant
+                    on descendant.ancestor_id = child.id
+                join Lineage ancestor
+                    on ancestor.descendant_id = new.id
+                where
+                    child.parent_id = new.id
+                ;
+
             end
             ;
             """,
